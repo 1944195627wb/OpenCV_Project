@@ -6,7 +6,7 @@ img = cv2.imread('2.jpg')
 img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
 #print(pytesseract.image_to_string(img,lang='chi_sim'))
 
-#检测字符
+# #检测字符
 # boxes = pytesseract.image_to_boxes(img,lang='chi_sim')
 # hImg,wImg,_ = img.shape
 # for b in boxes.splitlines():
@@ -29,7 +29,7 @@ for x,b in enumerate(boxes.splitlines()):
             cv2.rectangle(img,(x,y),(x+w,y+h),(0,0,255),1)
             cv2.putText(img,b[11],(x,y),cv2.FONT_HERSHEY_COMPLEX,1,(55,55,255),2)
 
-#检测单词,配置只能检测数字
+# #检测单词,配置只能检测数字
 # hImg,wImg,_ = img.shape
 # cong=r'--oem 3 --psm 6 outputbase digits'
 # boxes = pytesseract.image_to_data(img,lang='chi_sim',config=cong)

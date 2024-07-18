@@ -28,6 +28,7 @@ while True:
     imgBlur = cv2.GaussianBlur(imgGray,(5,5),1)
     #边缘检测
     imgCanny = cv2.Canny(imgBlur,10,50)
+    #cv2.imshow("Canny",imgCanny)
     try:
 
         #找到轮廓

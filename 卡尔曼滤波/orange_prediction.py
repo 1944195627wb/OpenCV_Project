@@ -27,6 +27,6 @@ while True:
     cv2.circle(frame, (predicted[0], predicted[1]), 20, (255, 0, 0), 4)
     frame = cv2.resize(frame, (640, 480))
     cv2.imshow("Frame", frame)
-    key = cv2.waitKey(150)
+    key = cv2.waitKey(30)
     if key == 27:
         break

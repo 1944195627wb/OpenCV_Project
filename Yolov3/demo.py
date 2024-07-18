@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from datetime import datetime
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture10)
 whT = 320
 confThreshold = 0.5
 nmsThreshold = 0.3
