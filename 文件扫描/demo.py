@@ -1,16 +1,16 @@
 import cv2
 import numpy as np
 import utlis
-
+import pytesseract
 
 ########################################################################
 #是否用摄像头
-webCamFeed = False                                                      #
-pathImage = "1.png"                                                    #
-cap = cv2.VideoCapture(0)                                              #
-cap.set(10,160)                                                        #
-heightImg = 640                                                        #
-widthImg  = 480                                                        #
+webCamFeed = False
+pathImage = "3.jpg"
+cap = cv2.VideoCapture(0)
+cap.set(10,160)
+heightImg = 640
+widthImg = 480
 ########################################################################
 
 utlis.initializeTrackbars()
@@ -26,8 +26,8 @@ while True:
     imgBlank = np.zeros((heightImg,widthImg, 3), np.uint8)
     imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     imgBlur = cv2.GaussianBlur(imgGray, (5, 5), 1) # 添加高斯模糊
-    thres=utlis.valTrackbars() #获取阈值的轨迹栏值
-    imgThreshold = cv2.Canny(imgBlur,thres[0],thres[1]) # 应用CANNY模糊
+    thres=utlis.valTrackbars() # 获取阈值的轨迹栏值
+    imgThreshold = cv2.Canny(imgBlur,thres[0],thres[1]) # 应用CANNY检测
     kernel = np.ones((5, 5))
     imgDial = cv2.dilate(imgThreshold, kernel, iterations=2)
     imgThreshold = cv2.erode(imgDial, kernel, iterations=1)
@@ -58,7 +58,19 @@ while True:
         imgAdaptiveThre= cv2.adaptiveThreshold(imgWarpGray, 255, 1, 1, 7, 2)
         imgAdaptiveThre = cv2.bitwise_not(imgAdaptiveThre)
         imgAdaptiveThre=cv2.medianBlur(imgAdaptiveThre,3)
-
+        # 检测单词
+        boxes = pytesseract.image_to_data(imgAdaptiveThre, lang='chi_sim')
+        # print(imgAdaptiveThre.shape)
+        hImg, wImg = imgAdaptiveThre.shape
+        for x, b in enumerate(boxes.splitlines()):
+            if x != 0:
+                b = b.split()
+                print(b)
+                if len(b) == 12:
+                    x, y, w, h = int(b[6]), int(b[7]), int(b[8]), int(b[9])
+                    cv2.rectangle(imgAdaptiveThre, (x, y), (x + w, y + h), (0, 0, 255), 1)
+                    cv2.putText(imgAdaptiveThre, b[11], (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (55, 55, 255), 2)
+        # cv2.imshow('Result2', imgAdaptiveThre)
         # 用于显示的图像阵列
         imageArray = ([img,imgGray,imgThreshold,imgContours],
                       [imgBigContour,imgWarpColored, imgWarpGray,imgAdaptiveThre])
@@ -72,6 +84,8 @@ while True:
               ["Biggest Contour","Warp Prespective","Warp Gray","Adaptive Threshold"]]
 
     stackedImage = utlis.stackImages(imageArray,0.75,lables)
+    w, h = stackedImage.shape[:2]
+    stackedImage = cv2.resize(stackedImage,(int(h/1.4),int(w/1.4)))
     cv2.imshow("Result",stackedImage)
 
     # 按下“s”键时保存图像
@@ -81,6 +95,8 @@ while True:
                       (1100, 350), (0, 255, 0), cv2.FILLED)
         cv2.putText(stackedImage, "Scan Saved", (int(stackedImage.shape[1] / 2) - 200, int(stackedImage.shape[0] / 2)),
                     cv2.FONT_HERSHEY_DUPLEX, 3, (0, 0, 255), 5, cv2.LINE_AA)
+        w,h = stackedImage.shape[:2]
+        stackedImage = cv2.resize(stackedImage,(640,480))
         cv2.imshow('Result', stackedImage)
         cv2.waitKey(300)
         count += 1
