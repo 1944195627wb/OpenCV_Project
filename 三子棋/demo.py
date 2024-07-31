@@ -3,7 +3,7 @@ import numpy as np
 import utlis
 
 #图片和其宽高
-path='chess/test/test.jpg'
+path='chess/test/chess.jpg'
 widthImg = 640
 heightImg = 480
 questions = 3
