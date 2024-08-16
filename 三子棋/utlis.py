@@ -103,14 +103,24 @@ def resize_and_pad(img, grid_size):
     padded_img = cv2.copyMakeBorder(img, 0, new_h - h, 0, new_w - w, cv2.BORDER_CONSTANT, value=(0, 0, 0))
     return padded_img
 
-def splitBoxes(img, rows=3, cols=3):
-    img = resize_and_pad(img, max(rows, cols))
-    split_rows = np.vsplit(img, rows)
+def splitBoxes(img_thresh, img_thresh_inv, rows=3, cols=3):
+    
+    img_thresh = resize_and_pad(img_thresh, max(rows, cols))
+    img_thresh_inv = resize_and_pad(img_thresh_inv, max(rows, cols))
+    
+    
+    split_rows_thresh = np.vsplit(img_thresh, rows)
+    split_rows_thresh_inv = np.vsplit(img_thresh_inv, rows)
+    
+    
     boxes = []
-    for r in split_rows:
-        split_cols = np.hsplit(r, cols)
-        for box in split_cols:
-            boxes.append(box)
+    for r in range(rows):
+        split_cols_thresh = np.hsplit(split_rows_thresh[r], cols)
+        split_cols_thresh_inv = np.hsplit(split_rows_thresh_inv[r], cols)
+        
+        for c in range(cols):
+            boxes.append([split_cols_thresh[c], split_cols_thresh_inv[c]])
+    
     return boxes
 
 def showAnswers(img,myIndex,grading,ans,questions,choices):
